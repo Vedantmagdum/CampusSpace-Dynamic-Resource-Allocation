@@ -15,8 +15,8 @@ The project helps students discover and book available classrooms, laboratory di
 |---|---|
 | **Vedant Magdum** | Team Leader, Backend Development & Presentation |
 | **Ajit Jamdade** | Database Management & Research |
-| **Pradnya** | Frontend Development |
-| **Supriya** | Presentation & Backend Development Support |
+| **Pradnya Madhyalkar** | Frontend Development |
+| **Supriya Nanganure** | Presentation & Backend Development Support |
 
 ---
 
@@ -182,25 +182,6 @@ Open your browser and visit:
 
 ---
 
-## 🐘 PostgreSQL Configuration
-
-1. Install PostgreSQL from the [official PostgreSQL website](https://www.postgresql.org/download/windows/).
-2. Create a database named `campus_space`.
-3. Configure the database connection and secret variables in PowerShell.
-
-```powershell
-$env:DATABASE_URL = "postgresql://postgres:YOUR_PASSWORD@localhost:5432/campus_space"
-$env:SECRET_KEY = "your-long-random-secret"
-$env:ADMIN_EMAIL = "admin@your-college.edu"
-$env:ADMIN_PASSWORD = "your-strong-admin-password"
-$env:LIBRARY_QR_TOKEN = "your-random-library-token"
-
-python app.py
-```
-
-Replace the example values with your own credentials. Never commit real passwords, tokens, or `.env` files to GitHub.
-
----
 
 ## 🧪 Testing Checklist
 
