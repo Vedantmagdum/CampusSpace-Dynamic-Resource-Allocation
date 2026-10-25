@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Campus feedback{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">CAMPUS CARE</div><h1>Complaints & compliments</h1><p class="muted">Report an issue for resolution or recognize someone who made a positive difference.</p></div></div>
+<div class="row g-4">
+  <div class="col-lg-6"><div class="panel"><h2>Submit a complaint</h2><form method="post" enctype="multipart/form-data"><input type="hidden" name="kind" value="complaint">
+    <label class="form-label mt-3">Title</label><input class="form-control" name="title" maxlength="160" required>
+    <label class="form-label mt-3">Category</label><select class="form-select" name="category" required>{% for c in ['Classroom / Lab','IT / Wi-Fi','Timetable / Booking','Library','Cleanliness / Maintenance','Other'] %}<option>{{ c }}</option>{% endfor %}</select>
+    <label class="form-label mt-3">Location</label><input class="form-control" name="location" maxlength="160" placeholder="Building, room or area">
+    <label class="form-label mt-3">Priority</label><select class="form-select" name="priority"><option value="normal">Normal</option><option value="low">Low</option><option value="high">High</option><option value="urgent">Urgent</option></select>
+    <label class="form-label mt-3">Description</label><textarea class="form-control" name="description" rows="4" maxlength="2000" required></textarea>
+    <label class="form-label mt-3">Optional image (PNG/JPG/WEBP, max 8 MB)</label><input class="form-control" type="file" name="attachment" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+    <button class="btn btn-primary w-100 mt-3">Submit complaint</button>
+  </form></div>
+  <div class="panel mt-4"><h2>Give a compliment</h2><form method="post"><input type="hidden" name="kind" value="compliment">
+    <label class="form-label mt-3">Category</label><select class="form-select" name="compliment_category" required>{% for c in ['Faculty support','Administrative service','Maintenance team','Helpful student','Collaboration group','Campus facility','Other'] %}<option>{{ c }}</option>{% endfor %}</select>
+    <label class="form-label mt-3">Recipient (optional)</label><input class="form-control" name="recipient" maxlength="160" placeholder="Person, team or service">
+    <label class="form-label mt-3">Appreciation</label><textarea class="form-control" name="compliment_description" rows="3" maxlength="1200" required></textarea>
+    <label class="form-check mt-3"><input class="form-check-input" type="checkbox" name="is_public" value="yes"><span class="form-check-label">Share publicly with campus users</span></label>
+    <button class="btn btn-outline-primary w-100 mt-3">Send appreciation</button>
+  </form></div></div>
+  <div class="col-lg-6"><div class="panel"><div class="panel-heading"><div><h2>{% if current_user.role=='admin' %}Complaint management{% else %}My complaints{% endif %}</h2><p class="small muted mb-0">Track each issue using its complaint ID.</p></div></div>
+    {% for c in complaints %}<div class="booking-review"><div class="d-flex justify-content-between gap-2"><div><strong>{{ c.complaint_code }} · {{ c.title }}</strong><small class="d-block">{{ c.category }} · {{ c.location or 'Location not specified' }}</small></div><span class="status-pill {{ 'approved' if c.status=='Resolved' else 'pending' }}">{{ c.status }}</span></div><p class="small mt-2 mb-1">{{ c.description }}</p><small class="muted">Priority: {{ c.priority|title }} · Routed to {{ c.assigned_department }} · {{ c.created_at.strftime('%d %b %Y') }}</small>{% if c.attachment_name %}<p class="small mb-1"><a href="{{ url_for('complaint_attachment',complaint_id=c.id) }}">View attached image</a></p>{% endif %}
+      {% if current_user.role=='admin' %}<form method="post" action="{{ url_for('update_complaint',complaint_id=c.id) }}" class="mt-2"><div class="row g-2"><div class="col-5"><select class="form-select form-select-sm" name="status">{% for s in ['Submitted','Assigned','In Progress','Resolved','Reopened'] %}<option {{ 'selected' if s==c.status else '' }}>{{ s }}</option>{% endfor %}</select></div><div class="col-7"><input class="form-control form-control-sm" name="resolution_notes" value="{{ c.resolution_notes }}" placeholder="Resolution / staff note"></div></div><button class="btn btn-sm btn-primary mt-2">Update status</button></form>{% elif c.resolution_notes %}<p class="small mt-2 mb-0">Resolution note: {{ c.resolution_notes }}</p>{% endif %}
+    </div>{% else %}<div class="empty-inline">No complaints to show.</div>{% endfor %}
+  </div>
+  <div class="panel mt-4"><div class="panel-heading"><h2>Compliments</h2><span class="status-pill neutral">{{ compliments|length }} shown</span></div>
+    {% for c in compliments %}<div class="booking-review"><strong>{{ c.category }}{% if c.recipient %} · {{ c.recipient }}{% endif %}</strong><p class="small mt-2 mb-1">{{ c.description }}</p><small class="muted">{% if c.is_public %}Shared publicly{% else %}Private appreciation{% endif %} · {{ c.created_at.strftime('%d %b %Y') }}</small></div>{% else %}<div class="empty-inline">No compliments to show yet.</div>{% endfor %}
+  </div></div>
+</div>
+{% endblock %}

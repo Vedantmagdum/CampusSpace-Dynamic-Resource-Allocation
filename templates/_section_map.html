@@ -1,0 +1,50 @@
+{# Tap-to-book seat map. Shared by the booking page and the student / faculty / admin dashboards.
+   Variables: map_room_id, map_selectable, map_start, map_end, map_select, map_room_select #}
+<div class="section-map" data-api-template="{{ url_for('section_status', room_id=0) }}" data-book-template="{{ url_for('book_section_api', room_id=0) }}"
+     {% if map_room_id %}data-room-id="{{ map_room_id }}"{% endif %}
+     {% if map_selectable %}data-selectable="1"{% endif %}
+     {% if map_start %}data-start="{{ map_start }}"{% endif %}
+     {% if map_end %}data-end="{{ map_end }}"{% endif %}
+     {% if map_select %}data-select="{{ map_select }}"{% endif %}
+     {% if map_room_select %}data-room-select="{{ map_room_select }}"{% endif %}>
+  <div class="section-map-head">
+    <div><strong class="sm-title">Seat availability</strong><div class="small muted sm-window">Loading…</div></div>
+    <div class="sm-summary"></div>
+  </div>
+  <div class="section-map-legend">
+    {% if seat_free_color == 'green' %}
+    <span><i class="sm-dot free-green"></i>Green = free{% if map_selectable %} · tap to book{% endif %}</span><span><i class="sm-dot booked-red"></i>Red = booked</span>
+    {% else %}
+    <span><i class="sm-dot free-red"></i>Red = free{% if map_selectable %} · tap to book{% endif %}</span><span><i class="sm-dot booked-green"></i>Green = booked</span>
+    {% endif %}
+  </div>
+  <div class="hall free-{{ seat_free_color }}">
+    <div class="hall-top"><div class="hall-screen">BOARD / FRONT OF ROOM</div></div>
+    <div class="hall-stage">TEACHER AREA</div>
+    <div class="sm-alert" hidden></div>
+    <div class="hall-body">
+      <div class="hall-block hall-left"></div>
+      <div class="hall-aisle"></div>
+      <div class="hall-block hall-right"></div>
+    </div>
+  </div>
+  <div class="sm-note"></div>
+
+  <dialog class="qb-dialog">
+    <form method="dialog" class="qb-form" novalidate>
+      <h3 class="qb-title">Book section</h3>
+      <p class="qb-sub muted small"></p>
+      <div class="qb-fields">
+        <label class="form-label">Start<input class="form-control qb-start" type="datetime-local" required></label>
+        <label class="form-label">End<input class="form-control qb-end" type="datetime-local" required></label>
+        <label class="form-label">Number of people<input class="form-control qb-people" type="number" min="1" value="2" required></label>
+        <label class="form-label">Purpose<input class="form-control qb-purpose" type="text" maxlength="500" value="Group discussion" required></label>
+      </div>
+      <div class="qb-msg" role="status" hidden></div>
+      <div class="qb-actions">
+        <button type="button" class="btn btn-outline-secondary qb-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary qb-confirm">Confirm booking</button>
+      </div>
+    </form>
+  </dialog>
+</div>

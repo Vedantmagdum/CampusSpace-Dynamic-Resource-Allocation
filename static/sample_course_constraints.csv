@@ -1,0 +1,3 @@
+subject,batch,faculty,weekly_sessions,duration_minutes,students,room_type
+Database Systems,CS-A,Prof Example,2,60,35,classroom
+Python Lab,CS-B,Prof Sample,2,120,24,lab
