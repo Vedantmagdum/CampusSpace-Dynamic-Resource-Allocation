@@ -1,104 +1,252 @@
-# CampusSpace — DevNova | SIH 2026
 
-Flask-based campus resource prototype with PostgreSQL support.
+# 🏫 CampusSpace — DevNova
 
-## Roles and main flows
+### Smart Campus Resource Allocation & Management System
 
-- **Student:** register (pending until admin approval), sign in, view room status, search by capacity/equipment/time, book a discussion section inside a classroom/lab (instead of reserving the whole room), use collaboration matching/invitations, submit complaints and compliments, view notices, and check in/out of the library.
-- **Faculty:** register and sign in, view the timetable, and record emergency class cancellations. A cancelled timetable entry no longer blocks the room; approved students/faculty receive in-app notices.
-- **Admin:** approve/reject student accounts and restricted-facility requests, add rooms, maintain/import timetables, generate weekly schedules from course constraints, manage complaints, and view utilization analytics.
-- **Library:** QR code is generated from the current website URL. Scanning it opens a verified page; the signed-in user confirms check-in. Active sessions are used as an estimate of occupied seats and check-out frees capacity.
+CampusSpace is a Flask-based campus resource management prototype developed for **Hello World 2026**, organized by **ACSES × Semicolon** at KIT's College of Engineering, Kolhapur.
 
-## Run locally on Windows PowerShell
+The project helps students discover and book available classrooms, laboratory discussion zones, and campus facilities while enabling faculty and administrators to manage timetables, room allocation, and campus operations.
 
-1. Install Python 3.11 or 3.12.
-2. Extract this ZIP and open PowerShell in the `CampusSpace` folder.
-3. Create and activate a virtual environment:
+---
 
-   ```powershell
-   py -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   ```
+## 👥 Team DevNova
 
-4. Install dependencies:
+| Team Member | Role |
+|---|---|
+| **Vedant Magdum** | Team Leader, Backend Development & Presentation |
+| **Ajit Jamdade** | Database Management & Research |
+| **Pradnya** | Frontend Development |
+| **Supriya** | Presentation & Backend Development Support |
 
-   ```powershell
-   python -m pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
+---
 
-5. Optional: copy `.env.example` to `.env` and set variables. Flask does not load `.env` automatically; either set them in PowerShell or install/use a dotenv loader. SQLite is used by default if `DATABASE_URL` is not set.
-6. Start:
+## 🏆 Hackathon Details
 
-   ```powershell
-   python app.py
-   ```
+- **Event:** Hello World 2026
+- **Organized by:** ACSES × Semicolon
+- **Track:** Beginner Track
+- **Problem Statement:** 2 — Dynamic Resource Allocation for College Facilities
+- **Achievement:** Shortlisted among 20 teams from approximately 70 registered teams
+- **Development Sprint:** 4-hour offline hackathon
 
-7. Visit http://127.0.0.1:5000
+---
 
-Default local demo administrator: `admin@campus.local` / `Admin@12345`. This is for local demo only. Set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `SECRET_KEY` before public deployment. Do not publish real credentials.
+## 🎯 Problem Statement
 
-## Use PostgreSQL locally
+Classrooms and laboratories often remain unused when scheduled classes are not taking place, while students struggle to find available spaces for group discussions, collaborative projects, and study sessions.
 
-1. Install PostgreSQL from https://www.postgresql.org/download/windows/ and optionally install pgAdmin.
-2. In pgAdmin, connect to your local PostgreSQL server.
-3. Create a database named `campus_space` (Databases → Create → Database).
-4. Set the `DATABASE_URL` environment variable in the same PowerShell terminal (replace password with your actual password):
+CampusSpace addresses this problem by providing a centralized platform for checking room availability and managing campus resources.
 
-   ```powershell
-   $env:DATABASE_URL = "postgresql://postgres:YOUR_PASSWORD@localhost:5432/campus_space"
-   $env:SECRET_KEY = "put-a-long-random-secret-here"
-   $env:ADMIN_EMAIL = "admin@your-college.edu"
-   $env:ADMIN_PASSWORD = "a-strong-unique-admin-password"
-   $env:LIBRARY_QR_TOKEN = "a-long-random-token"
-   python app.py
-   ```
+---
 
-5. The app creates its tables and demo rooms/timetable when it starts. Keep credentials private. If your database password contains reserved URL characters, URL-encode them.
+## ✨ Key Features
 
+### 🎓 Student Module
 
-## Pre-deployment test checklist
+- Student registration and admin approval.
+- Secure login and account access.
+- View room availability and search by capacity, equipment, and time.
+- Book specific discussion sections inside classrooms and laboratories.
+- Collaboration matching and group invitations.
+- Submit complaints and compliments.
+- View notices and notifications.
+- Library check-in and check-out using QR codes.
 
-- [ ] Register student; confirm login is blocked while pending.
-- [ ] Admin approves student; student can then sign in.
-- [ ] Student books a specific classroom/lab discussion section; the selected section appears on the dashboard and admin review screen.
-- [ ] Two groups can book different sections of the same room for overlapping times, while a conflicting same-section or whole-room booking is blocked.
-- [ ] Admin can add sections while keeping combined active section capacity within the room capacity.
-- [ ] Admin approval appears in student notifications/dashboard.
-- [ ] Overlapping timetable or approved booking blocks a request.
-- [ ] Faculty cancels a scheduled lecture; room status changes and notices appear.
-- [ ] Library QR opens the deployed URL; check-in increases estimated occupancy; check-out reduces it.
-- [ ] Restart/redeploy and verify data persists in PostgreSQL.
+### 👨‍🏫 Faculty Module
 
-## Added workflows
+- Faculty registration and login.
+- View timetable information.
+- Record emergency class cancellations.
+- Notify relevant users about timetable changes.
 
-- **Section-based booking:** classrooms and labs expose separately bookable discussion zones. A booking reserves only the selected zone; different zones may be booked concurrently. Whole-room timetable entries and whole-room bookings still block all sections. Admins can add zones from Manage rooms, and active section capacities may not exceed the room capacity. Demo zones are seeded automatically and must be adjusted to the actual physical floor plan.
-- **Automatic booking decisions:** valid classroom-section bookings are approved immediately after server-side conflict checks. Room types listed in `MANUAL_APPROVAL_ROOM_TYPES` (default: `lab,seminar`) require admin review.
-- **Timetable import:** admins can upload CSV or text-extractable PDF files using `room_code,title,starts_at,ends_at` plus optional `batch,faculty`. Scanned PDFs need OCR, which is not bundled.
-- **Timetable generation:** admins can upload a course-constraints CSV (`subject,batch,faculty,weekly_sessions,duration_minutes,students,room_type`). The greedy scheduler fills weekdays 09:00–17:00 for the next Monday–Friday and saves only if all sessions can be placed. It checks configured room capacity/type, room conflicts, batch conflicts, and faculty conflicts.
-- **Collaboration:** campus-visible requests are ranked with explainable rule-based signals (purpose, overlapping topic tokens, complementary skill tokens, and nearby preferred times). Invitations require acceptance before a group is created.
-- **Feedback:** complaints receive a tracking code and category-based department routing; admins can update status and resolution notes. Image attachments are private to the reporter and admins. Compliments support private/public visibility.
-- **Sample CSVs:** download `sample_timetable.csv`, `sample_timetable.pdf`, and `sample_course_constraints.csv` from the relevant admin pages.
+### 🛡️ Admin Module
 
-## Prototype limitations
+- Approve or reject student accounts.
+- Manage restricted-facility booking requests.
+- Add and manage rooms and discussion sections.
+- Import timetables using CSV or text-extractable PDF files.
+- Generate weekly schedules using course constraints.
+- Manage complaints and resolution status.
+- View basic resource utilization analytics.
 
-- Library occupancy is based on check-in sessions, not real sensors; users must check out. Automatic expiry and reminder scheduling are not implemented.
-- Analytics are basic record-count estimates, not full time-weighted utilization reports.
-- The campus map is a room directory/floor overview, not a surveyed architectural map.
-- Faculty cancellation currently applies to timetable entries visible to faculty; production deployment should restrict cancellations to classes assigned to that faculty member and add audit/approval policy.
-- Production hardening still requires CSRF protection, rate limiting, stronger admin bootstrap/secret management, and a concurrency-safe database constraint for overlapping bookings. SQLite does not guarantee protection against simultaneous booking races in this prototype.
-- Timetable generation is a greedy heuristic, not a globally optimal solver or trained AI model. PDF import requires text extraction to retain a CSV-like row structure; scanned-PDF OCR is not included.
-- Collaboration recommendations are transparent keyword/rule heuristics, not trained AI. Automatic push/email delivery and background reminders are not implemented; notifications are in-app.
+### 🪑 Smart Room Allocation
 
-## Organization-only access
+- Section-based booking for classrooms and laboratories.
+- Conflict checking for room, timetable, and booking schedules.
+- Automatic approval for eligible classroom-section bookings.
+- Manual review for configured restricted room types.
+- Multiple discussion sections can be booked independently when there are no conflicts.
 
-Only members of your organization can register or sign in.
+### 📚 Library Management
 
-- Set your organization's email domain(s) before starting the app:
-  - Windows PowerShell: `$env:ORG_EMAIL_DOMAINS = "yourcollege.edu"` (comma-separate several domains; subdomains such as `cs.yourcollege.edu` are included).
-  - If you do not set it, the domain of `ADMIN_EMAIL` is used.
-  - `ORG_EMAIL_DOMAINS=*` turns the restriction off (open demo only).
-- Emails from any other domain are rejected at registration, blocked at login, and cannot be approved by an admin.
-- Every new student and faculty account must be approved by an admin. To let faculty in immediately, set `FACULTY_AUTO_APPROVE=true`.
-- Guests only see the landing page. Rooms, booking, library and all APIs need a signed-in, approved member.
-- The admin account is created from `ADMIN_EMAIL` / `ADMIN_PASSWORD` and is not blocked by the domain rule.
+- QR code linked to the current website URL.
+- Verified library check-in and check-out.
+- Estimated seat occupancy based on active sessions.
+
+### 🤝 Collaboration & Feedback
+
+- Rule-based collaboration recommendations.
+- Group invitations requiring acceptance.
+- Complaint tracking with category-based routing.
+- Private complaint attachments and configurable compliment visibility.
+
+---
+
+## 🛠️ Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Python | Application logic |
+| Flask | Backend and web framework |
+| HTML5 | Web page structure |
+| CSS3 | Styling and responsive layouts |
+| JavaScript | Client-side interactions |
+| PostgreSQL | Database option |
+| SQLite | Default local fallback when `DATABASE_URL` is not configured |
+| Git & GitHub | Version control |
+
+---
+
+## 📁 Project Structure
+
+```text
+CampusSpace/
+├── app.py
+├── requirements.txt
+├── Procfile
+├── .env.example
+├── .gitignore
+├── README.md
+├── routes/
+├── templates/
+├── static/
+└── ...
+```
+
+*Note: The structure above is illustrative. Actual files may differ.*
+
+---
+
+## ⚙️ Installation & Setup
+
+### Prerequisites
+
+- Python 3.11 or 3.12
+- Git
+- PostgreSQL for PostgreSQL configuration
+- Visual Studio Code (recommended)
+
+### 1. Clone the Repository
+
+```bash
+git clone YOUR_GITHUB_REPOSITORY_URL
+cd CampusSpace
+```
+
+Replace `YOUR_GITHUB_REPOSITORY_URL` with your actual GitHub repository URL.
+
+### 2. Create a Virtual Environment
+
+```powershell
+py -m venv .venv
+```
+
+Activate it in Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+### 3. Install Dependencies
+
+```powershell
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### 4. Configure the Application
+
+Optionally, copy `.env.example` to `.env` and configure the environment variables.
+
+Flask does not automatically load `.env` without a dotenv loader. You can configure variables directly in PowerShell.
+
+### 5. Run the Application
+
+```powershell
+python app.py
+```
+
+Open your browser and visit:
+
+**http://127.0.0.1:5000**
+
+---
+
+## 🐘 PostgreSQL Configuration
+
+1. Install PostgreSQL from the [official PostgreSQL website](https://www.postgresql.org/download/windows/).
+2. Create a database named `campus_space`.
+3. Configure the database connection and secret variables in PowerShell.
+
+```powershell
+$env:DATABASE_URL = "postgresql://postgres:YOUR_PASSWORD@localhost:5432/campus_space"
+$env:SECRET_KEY = "your-long-random-secret"
+$env:ADMIN_EMAIL = "admin@your-college.edu"
+$env:ADMIN_PASSWORD = "your-strong-admin-password"
+$env:LIBRARY_QR_TOKEN = "your-random-library-token"
+
+python app.py
+```
+
+Replace the example values with your own credentials. Never commit real passwords, tokens, or `.env` files to GitHub.
+
+---
+
+## 🧪 Testing Checklist
+
+- [ ] Student registration and admin approval.
+- [ ] Login restrictions for unapproved users.
+- [ ] Room and discussion-section booking.
+- [ ] Booking conflict validation.
+- [ ] Admin room and timetable management.
+- [ ] Faculty emergency class cancellation.
+- [ ] Notifications after relevant changes.
+- [ ] Library QR check-in and check-out.
+- [ ] Database persistence after restart.
+
+---
+
+## ⚠️ Current Limitations
+
+- Library occupancy is estimated from active check-in sessions, not physical sensors.
+- Analytics are basic record-count estimates.
+- The campus map is a room directory or floor overview, not a surveyed architectural map.
+- Timetable generation uses a greedy scheduling heuristic, not a globally optimal solver.
+- Collaboration recommendations use transparent rules and keyword matching, not a trained AI model.
+- Scanned PDF timetable import requires OCR, which is not included.
+- Production deployment needs additional security hardening and concurrency-safe booking validation.
+
+---
+
+## 🚀 Future Improvements
+
+- Improve the campus map with verified floor plans.
+- Add automated notification delivery and reminders.
+- Enhance analytics with time-based utilization reports.
+- Strengthen security, access control, and booking concurrency protection.
+- Improve scheduling algorithms and resource recommendations.
+
+---
+
+## 🙌 Acknowledgements
+
+We thank **ACSES × Semicolon**, the organizers, mentors, and judges of Hello World 2026 for providing an opportunity to build and present our solution.
+
+Developed by **Team DevNova** with the goal of making campus resource allocation more accessible and efficient.
+
+---
+
+**Project:** CampusSpace  
+**Team:** DevNova  
+**Team Leader:** Vedant Magdum
+
