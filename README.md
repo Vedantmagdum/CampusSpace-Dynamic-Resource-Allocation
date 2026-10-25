@@ -56,20 +56,6 @@ Default local demo administrator: `admin@campus.local` / `Admin@12345`. This is 
 
 5. The app creates its tables and demo rooms/timetable when it starts. Keep credentials private. If your database password contains reserved URL characters, URL-encode them.
 
-## Deploy to Render
-
-1. Push the `CampusSpace` folder contents to a GitHub repository.
-2. In Render, create a managed PostgreSQL database. Copy its **Internal Database URL** when the web service and database are in the same Render region.
-3. Create a Render **Web Service** from the GitHub repository.
-4. Build command: `pip install -r requirements.txt`
-5. Start command: `gunicorn app:app`
-6. In the service's Environment settings add:
-   - `DATABASE_URL` = Render PostgreSQL Internal Database URL
-   - `SECRET_KEY` = long random secret
-   - `ADMIN_EMAIL` = admin email
-   - `ADMIN_PASSWORD` = strong unique password
-   - `LIBRARY_QR_TOKEN` = long random token
-7. Deploy. Open the deployed website, test all roles, then print the QR code from the Library page. If you change the deployed domain, regenerate/reprint the QR code.
 
 ## Pre-deployment test checklist
 
